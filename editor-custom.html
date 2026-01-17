@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éditeur HTML WYSIWYG</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .header .back-link {
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            text-decoration: none;
+            font-size: 24px;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .header .back-link:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .toolbar {
+            background: #ffffff;
+            border: 2px solid #e9ecef;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 5px 5px 0 0;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .toolbar button {
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            background: white;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .toolbar button:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+        }
+
+        .toolbar button:active {
+            background: #e9ecef;
+        }
+
+        .toolbar select {
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+            background: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .toolbar .separator {
+            width: 1px;
+            background: #dee2e6;
+            margin: 0 5px;
+        }
+
+        #editor-container {
+            min-height: 500px;
+            max-height: 500px;
+            overflow-y: auto;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+            outline: none;
+        }
+
+        #editor-container:focus {
+            border-color: #667eea;
+        }
+
+        #source-view {
+            display: none;
+        }
+
+        #source-code {
+            width: 100%;
+            height: 500px;
+            padding: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 5px;
+            resize: vertical;
+            background: #f8f9fa;
+        }
+
+        .mode-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .mode-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .mode-visual {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .mode-source {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .info-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            border-radius: 5px;
+        }
+
+        .info-box h3 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            color: #424242;
+        }
+
+        .info-box li {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+                padding-left: 50px;
+            }
+            
+            .header .back-link {
+                left: 15px;
+                font-size: 20px;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+
+            .mode-indicator {
+                width: 100%;
+                justify-content: center;
+                margin-left: 0;
+                margin-top: 10px;
+            }
+
+            .toolbar button {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-link" title="Retour au choix d'éditeur">←</a>
+            <h1>📝 Éditeur HTML WYSIWYG</h1>
+            <p>Éditeur personnalisé - Collez votre texte, éditez-le visuellement, et récupérez le code HTML</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="toggleView()">
+                <span id="toggle-text">📄 Voir le code source</span>
+            </button>
+            <button class="btn btn-secondary" onclick="clearEditor()">🗑️ Effacer</button>
+            <button class="btn btn-success" onclick="copyHTML()">📋 Copier HTML</button>
+            
+            <div class="mode-indicator">
+                <span>Mode actuel:</span>
+                <span class="mode-badge mode-visual" id="mode-badge">✏️ Édition visuelle</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Visual Editor -->
+            <div id="visual-view">
+                <div class="toolbar">
+                    <select onchange="formatDoc('formatBlock', this.value); this.selectedIndex=0;">
+                        <option selected disabled hidden>Format</option>
+                        <option value="h1">Titre 1</option>
+                        <option value="h2">Titre 2</option>
+                        <option value="h3">Titre 3</option>
+                        <option value="h4">Titre 4</option>
+                        <option value="p">Paragraphe</option>
+                        <option value="pre">Préformaté</option>
+                    </select>
+                    
+                    <select onchange="formatDoc('fontName', this.value); this.selectedIndex=0;">
+                        <option selected disabled hidden>Police</option>
+                        <option value="Arial">Arial</option>
+                        <option value="Courier New">Courier New</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Times New Roman">Times New Roman</option>
+                        <option value="Verdana">Verdana</option>
+                    </select>
+                    
+                    <select onchange="formatDoc('fontSize', this.value); this.selectedIndex=0;">
+                        <option selected disabled hidden>Taille</option>
+                        <option value="1">Très petit</option>
+                        <option value="2">Petit</option>
+                        <option value="3">Normal</option>
+                        <option value="4">Moyen</option>
+                        <option value="5">Grand</option>
+                        <option value="6">Très grand</option>
+                        <option value="7">Maximum</option>
+                    </select>
+                    
+                    <div class="separator"></div>
+                    
+                    <button onclick="formatDoc('bold')" title="Gras"><b>G</b></button>
+                    <button onclick="formatDoc('italic')" title="Italique"><i>I</i></button>
+                    <button onclick="formatDoc('underline')" title="Souligné"><u>S</u></button>
+                    <button onclick="formatDoc('strikeThrough')" title="Barré"><s>B</s></button>
+                    
+                    <div class="separator"></div>
+                    
+                    <button onclick="formatDoc('justifyLeft')" title="Aligner à gauche">☰</button>
+                    <button onclick="formatDoc('justifyCenter')" title="Centrer">☷</button>
+                    <button onclick="formatDoc('justifyRight')" title="Aligner à droite">☰</button>
+                    <button onclick="formatDoc('justifyFull')" title="Justifier">▦</button>
+                    
+                    <div class="separator"></div>
+                    
+                    <button onclick="formatDoc('insertOrderedList')" title="Liste numérotée">1. 2. 3.</button>
+                    <button onclick="formatDoc('insertUnorderedList')" title="Liste à puces">• • •</button>
+                    <button onclick="formatDoc('outdent')" title="Diminuer le retrait">◁</button>
+                    <button onclick="formatDoc('indent')" title="Augmenter le retrait">▷</button>
+                    
+                    <div class="separator"></div>
+                    
+                    <button onclick="formatDoc('insertHorizontalRule')" title="Ligne horizontale">―</button>
+                    <button onclick="addLink()" title="Insérer un lien">🔗</button>
+                    <button onclick="formatDoc('unlink')" title="Supprimer le lien">⛓️‍💥</button>
+                    
+                    <div class="separator"></div>
+                    
+                    <button onclick="formatDoc('undo')" title="Annuler">↶</button>
+                    <button onclick="formatDoc('redo')" title="Rétablir">↷</button>
+                    <button onclick="formatDoc('removeFormat')" title="Supprimer le formatage">🧹</button>
+                </div>
+                <div id="editor-container" contenteditable="true"></div>
+            </div>
+
+            <!-- Source Code View -->
+            <div id="source-view">
+                <textarea id="source-code" placeholder="Le code HTML apparaîtra ici..."></textarea>
+            </div>
+
+            <div class="info-box">
+                <h3>💡 Instructions d'utilisation</h3>
+                <ul>
+                    <li><strong>Coller du texte:</strong> Collez directement votre texte depuis Word ou tout autre éditeur</li>
+                    <li><strong>Éditer:</strong> Utilisez la barre d'outils pour formater votre texte (gras, italique, listes, etc.)</li>
+                    <li><strong>Voir le code:</strong> Cliquez sur "Voir le code source" pour afficher le HTML généré</li>
+                    <li><strong>Copier le HTML:</strong> Utilisez le bouton "Copier HTML" pour copier le code dans le presse-papiers</li>
+                    <li><strong>Modifier le HTML:</strong> En mode source, vous pouvez modifier directement le HTML et revenir en mode visuel</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const editor = document.getElementById('editor-container');
+        let isSourceView = false;
+
+        // Format document using execCommand
+        function formatDoc(command, value = null) {
+            document.execCommand(command, false, value);
+            editor.focus();
+        }
+
+        // Add link
+        function addLink() {
+            const url = prompt('Entrez l\'URL du lien:', 'https://');
+            if (url && url !== '' && url !== 'https://') {
+                formatDoc('createLink', url);
+            }
+        }
+
+        // Toggle between visual and source view
+        function toggleView() {
+            const visualView = document.getElementById('visual-view');
+            const sourceView = document.getElementById('source-view');
+            const toggleText = document.getElementById('toggle-text');
+            const modeBadge = document.getElementById('mode-badge');
+
+            if (isSourceView) {
+                // Switch to visual view
+                // Update editor content from source code
+                const sourceCode = document.getElementById('source-code').value;
+                editor.innerHTML = sourceCode;
+                
+                visualView.style.display = 'block';
+                sourceView.style.display = 'none';
+                toggleText.textContent = '📄 Voir le code source';
+                modeBadge.textContent = '✏️ Édition visuelle';
+                modeBadge.className = 'mode-badge mode-visual';
+                isSourceView = false;
+            } else {
+                // Switch to source view
+                const html = editor.innerHTML;
+                document.getElementById('source-code').value = formatHTML(html);
+                
+                visualView.style.display = 'none';
+                sourceView.style.display = 'block';
+                toggleText.textContent = '✏️ Retour à l\'édition';
+                modeBadge.textContent = '💻 Code source';
+                modeBadge.className = 'mode-badge mode-source';
+                isSourceView = true;
+            }
+        }
+
+        // Format HTML for better readability
+        function formatHTML(html) {
+            // Simple formatting - add line breaks after tags
+            let formatted = html
+                .replace(/></g, '>\n<')
+                .replace(/<div>/gi, '<div>\n')
+                .replace(/<\/div>/gi, '\n</div>')
+                .replace(/<p>/gi, '<p>\n')
+                .replace(/<\/p>/gi, '\n</p>')
+                .replace(/<ul>/gi, '<ul>\n')
+                .replace(/<\/ul>/gi, '\n</ul>')
+                .replace(/<ol>/gi, '<ol>\n')
+                .replace(/<\/ol>/gi, '\n</ol>')
+                .replace(/<li>/gi, '  <li>')
+                .replace(/<\/li>/gi, '</li>\n')
+                .replace(/<h([1-6])>/gi, '<h$1>\n')
+                .replace(/<\/h([1-6])>/gi, '\n</h$1>')
+                .replace(/<br>/gi, '<br>\n');
+            
+            return formatted;
+        }
+
+        // Clear editor content
+        function clearEditor() {
+            if (confirm('Êtes-vous sûr de vouloir effacer tout le contenu ?')) {
+                editor.innerHTML = '';
+                document.getElementById('source-code').value = '';
+            }
+        }
+
+        // Copy HTML to clipboard
+        function copyHTML() {
+            let htmlContent;
+            
+            if (isSourceView) {
+                htmlContent = document.getElementById('source-code').value;
+            } else {
+                htmlContent = editor.innerHTML;
+            }
+
+            // Use modern Clipboard API if available, fallback to execCommand
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(htmlContent)
+                    .then(() => {
+                        alert('✅ HTML copié dans le presse-papiers !');
+                    })
+                    .catch(err => {
+                        // Fallback to old method
+                        copyHTMLFallback(htmlContent);
+                    });
+            } else {
+                // Fallback for older browsers
+                copyHTMLFallback(htmlContent);
+            }
+        }
+
+        // Fallback copy method for older browsers
+        function copyHTMLFallback(htmlContent) {
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = htmlContent;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            
+            try {
+                document.execCommand('copy');
+                alert('✅ HTML copié dans le presse-papiers !');
+            } catch (err) {
+                alert('❌ Erreur lors de la copie. Utilisez Ctrl+C pour copier manuellement.');
+            }
+            
+            document.body.removeChild(tempTextarea);
+        }
+
+        // Add some sample content for demonstration
+        window.addEventListener('load', function() {
+            editor.innerHTML = `
+                <h2>Bienvenue dans l'éditeur WYSIWYG !</h2>
+                <p>Cet éditeur vous permet de :</p>
+                <ul>
+                    <li>Coller du texte depuis <strong>Word</strong> ou d'autres éditeurs</li>
+                    <li>Formater votre texte avec des <em>styles</em> variés</li>
+                    <li>Récupérer le <span style="background-color: yellow;">code HTML</span> généré</li>
+                </ul>
+                <p><br></p>
+                <p>Essayez de modifier ce texte ou d'en coller un nouveau !</p>
+            `;
+        });
+    </script>
+</body>
+</html>
