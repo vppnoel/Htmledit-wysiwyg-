@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éditeur HTML WYSIWYG - Choisissez votre éditeur</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .content {
+            padding: 50px 40px;
+        }
+
+        .intro {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .intro h2 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .intro p {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .editors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .editor-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .editor-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .editor-card.custom {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .editor-card.tinymce {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .editor-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .editor-card h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .editor-card p {
+            font-size: 1em;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .editor-card .features {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .editor-card .features li {
+            padding: 8px 0;
+            color: #444;
+            font-size: 0.95em;
+        }
+
+        .editor-card .features li:before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .editor-card .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .editor-card .btn:hover {
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+        .badge-new {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-professional {
+            background: #fd7e14;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .intro h2 {
+                font-size: 1.5em;
+            }
+
+            .editors-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content {
+                padding: 30px 20px;
+            }
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Éditeur HTML WYSIWYG</h1>
+            <p>Choisissez l'éditeur qui correspond le mieux à vos besoins</p>
+        </div>
+
+        <div class="content">
+            <div class="intro">
+                <h2>Deux éditeurs puissants à votre disposition</h2>
+                <p>Que vous recherchiez la simplicité ou des fonctionnalités avancées, nous avons l'éditeur qu'il vous faut.</p>
+            </div>
+
+            <div class="editors-grid">
+                <!-- Custom Editor Card -->
+                <a href="editor-custom.html" class="editor-card custom">
+                    <div class="editor-icon">✏️</div>
+                    <h3>Éditeur Personnalisé</h3>
+                    <span class="badge badge-new">Léger & Rapide</span>
+                    <p>Un éditeur simple et efficace, parfait pour une utilisation rapide sans dépendances externes.</p>
+                    
+                    <ul class="features">
+                        <li>Interface intuitive et épurée</li>
+                        <li>Aucune dépendance externe</li>
+                        <li>Chargement ultra-rapide</li>
+                        <li>Formatage de texte essentiel</li>
+                        <li>Vue code source intégrée</li>
+                        <li>Copie HTML en un clic</li>
+                    </ul>
+                    
+                    <button class="btn">Utiliser cet éditeur</button>
+                </a>
+
+                <!-- TinyMCE Editor Card -->
+                <a href="editor-tinymce.html" class="editor-card tinymce">
+                    <div class="editor-icon">🚀</div>
+                    <h3>TinyMCE</h3>
+                    <span class="badge badge-professional">Professionnel</span>
+                    <p>L'éditeur WYSIWYG le plus populaire au monde, avec des fonctionnalités avancées et professionnelles.</p>
+                    
+                    <ul class="features">
+                        <li>Interface professionnelle complète</li>
+                        <li>Plugins et extensions riches</li>
+                        <li>Support avancé du formatage</li>
+                        <li>Insertion d'images et médias</li>
+                        <li>Tableaux et mises en page complexes</li>
+                        <li>Rechercher/Remplacer intégré</li>
+                    </ul>
+                    
+                    <button class="btn">Utiliser cet éditeur</button>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>💡 Conseil :</strong> Pour une édition rapide et simple, choisissez l'éditeur personnalisé. 
+            Pour des besoins professionnels avec plus de fonctionnalités, optez pour TinyMCE.</p>
+        </div>
+    </div>
+
+    <script>
+        // Add click analytics or tracking if needed
+        document.querySelectorAll('.editor-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Optional: Add analytics tracking here
+                console.log('Editor selected:', this.querySelector('h3').textContent);
+            });
+        });
+    </script>
+</body>
+</html>

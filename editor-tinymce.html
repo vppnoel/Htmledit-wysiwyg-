@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Éditeur HTML WYSIWYG - TinyMCE</title>
+    
+    <!-- TinyMCE -->
+    <script src="tinymce/js/tinymce/tinymce.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .header .back-link {
+            position: absolute;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            text-decoration: none;
+            font-size: 24px;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .header .back-link:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .controls {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        #source-view {
+            display: none;
+        }
+
+        #source-code {
+            width: 100%;
+            height: 500px;
+            padding: 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 5px;
+            resize: vertical;
+            background: #f8f9fa;
+        }
+
+        .mode-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .mode-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .mode-visual {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .mode-source {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .info-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            border-radius: 5px;
+        }
+
+        .info-box h3 {
+            color: #1976D2;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            color: #424242;
+        }
+
+        .info-box li {
+            margin: 5px 0;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+                padding-left: 50px;
+            }
+            
+            .header .back-link {
+                left: 15px;
+                font-size: 20px;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+
+            .mode-indicator {
+                width: 100%;
+                justify-content: center;
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="index.html" class="back-link" title="Retour au choix d'éditeur">←</a>
+            <h1>📝 Éditeur HTML WYSIWYG</h1>
+            <p>Propulsé par TinyMCE - Collez votre texte, éditez-le visuellement, et récupérez le code HTML</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="toggleView()">
+                <span id="toggle-text">📄 Voir le code source</span>
+            </button>
+            <button class="btn btn-secondary" onclick="clearEditor()">🗑️ Effacer</button>
+            <button class="btn btn-success" onclick="copyHTML()">📋 Copier HTML</button>
+            
+            <div class="mode-indicator">
+                <span>Mode actuel:</span>
+                <span class="mode-badge mode-visual" id="mode-badge">✏️ Édition visuelle</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Visual Editor -->
+            <div id="visual-view">
+                <textarea id="editor"></textarea>
+            </div>
+
+            <!-- Source Code View -->
+            <div id="source-view">
+                <textarea id="source-code" placeholder="Le code HTML apparaîtra ici..."></textarea>
+            </div>
+
+            <div class="info-box">
+                <h3>💡 Instructions d'utilisation</h3>
+                <ul>
+                    <li><strong>Éditeur TinyMCE:</strong> Éditeur professionnel avec fonctionnalités avancées</li>
+                    <li><strong>Coller du texte:</strong> Collez directement votre texte depuis Word ou tout autre éditeur</li>
+                    <li><strong>Éditer:</strong> Utilisez la barre d'outils complète pour formater votre texte</li>
+                    <li><strong>Voir le code:</strong> Cliquez sur "Voir le code source" pour afficher le HTML généré</li>
+                    <li><strong>Copier le HTML:</strong> Utilisez le bouton "Copier HTML" pour copier le code dans le presse-papiers</li>
+                    <li><strong>Modifier le HTML:</strong> En mode source, vous pouvez modifier directement le HTML et revenir en mode visuel</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let editor;
+        let isSourceView = false;
+
+        // Initialize TinyMCE
+        tinymce.init({
+            selector: '#editor',
+            height: 500,
+            menubar: true,
+            plugins: [
+                'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                'insertdatetime', 'media', 'table', 'help', 'wordcount'
+            ],
+            toolbar: 'undo redo | blocks | ' +
+                'bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter ' +
+                'alignright alignjustify | bullist numlist outdent indent | ' +
+                'removeformat | help',
+            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+            setup: function(ed) {
+                editor = ed;
+                ed.on('init', function() {
+                    // Add sample content
+                    ed.setContent(`
+                        <h2>Bienvenue dans l'éditeur WYSIWYG TinyMCE !</h2>
+                        <p>Cet éditeur professionnel vous permet de :</p>
+                        <ul>
+                            <li>Coller du texte depuis <strong>Word</strong> ou d'autres éditeurs</li>
+                            <li>Formater votre texte avec des <em>styles</em> professionnels</li>
+                            <li>Récupérer le <span style="background-color: yellow;">code HTML</span> généré</li>
+                        </ul>
+                        <p>&nbsp;</p>
+                        <p>Essayez de modifier ce texte ou d'en coller un nouveau !</p>
+                    `);
+                });
+            }
+        });
+
+        // Toggle between visual and source view
+        function toggleView() {
+            const visualView = document.getElementById('visual-view');
+            const sourceView = document.getElementById('source-view');
+            const toggleText = document.getElementById('toggle-text');
+            const modeBadge = document.getElementById('mode-badge');
+
+            if (isSourceView) {
+                // Switch to visual view
+                const sourceCode = document.getElementById('source-code').value;
+                if (editor) {
+                    editor.setContent(sourceCode);
+                }
+                
+                visualView.style.display = 'block';
+                sourceView.style.display = 'none';
+                toggleText.textContent = '📄 Voir le code source';
+                modeBadge.textContent = '✏️ Édition visuelle';
+                modeBadge.className = 'mode-badge mode-visual';
+                isSourceView = false;
+            } else {
+                // Switch to source view
+                const html = editor ? editor.getContent() : '';
+                document.getElementById('source-code').value = formatHTML(html);
+                
+                visualView.style.display = 'none';
+                sourceView.style.display = 'block';
+                toggleText.textContent = '✏️ Retour à l\'édition';
+                modeBadge.textContent = '💻 Code source';
+                modeBadge.className = 'mode-badge mode-source';
+                isSourceView = true;
+            }
+        }
+
+        // Format HTML for better readability
+        function formatHTML(html) {
+            let formatted = html
+                .replace(/></g, '>\n<')
+                .replace(/<div>/gi, '<div>\n')
+                .replace(/<\/div>/gi, '\n</div>')
+                .replace(/<p>/gi, '<p>\n')
+                .replace(/<\/p>/gi, '\n</p>')
+                .replace(/<ul>/gi, '<ul>\n')
+                .replace(/<\/ul>/gi, '\n</ul>')
+                .replace(/<ol>/gi, '<ol>\n')
+                .replace(/<\/ol>/gi, '\n</ol>')
+                .replace(/<li>/gi, '  <li>')
+                .replace(/<\/li>/gi, '</li>\n')
+                .replace(/<h([1-6])>/gi, '<h$1>\n')
+                .replace(/<\/h([1-6])>/gi, '\n</h$1>')
+                .replace(/<br>/gi, '<br>\n');
+            
+            return formatted;
+        }
+
+        // Clear editor content
+        function clearEditor() {
+            if (confirm('Êtes-vous sûr de vouloir effacer tout le contenu ?')) {
+                if (editor) {
+                    editor.setContent('');
+                }
+                document.getElementById('source-code').value = '';
+            }
+        }
+
+        // Copy HTML to clipboard
+        function copyHTML() {
+            let htmlContent;
+            
+            if (isSourceView) {
+                htmlContent = document.getElementById('source-code').value;
+            } else {
+                htmlContent = editor ? editor.getContent() : '';
+            }
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(htmlContent)
+                    .then(() => {
+                        alert('✅ HTML copié dans le presse-papiers !');
+                    })
+                    .catch(err => {
+                        copyHTMLFallback(htmlContent);
+                    });
+            } else {
+                copyHTMLFallback(htmlContent);
+            }
+        }
+
+        // Fallback copy method for older browsers
+        function copyHTMLFallback(htmlContent) {
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = htmlContent;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            
+            try {
+                document.execCommand('copy');
+                alert('✅ HTML copié dans le presse-papiers !');
+            } catch (err) {
+                alert('❌ Erreur lors de la copie. Utilisez Ctrl+C pour copier manuellement.');
+            }
+            
+            document.body.removeChild(tempTextarea);
+        }
+    </script>
+</body>
+</html>
