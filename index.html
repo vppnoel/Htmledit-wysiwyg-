@@ -450,7 +450,24 @@
                 htmlContent = editor.innerHTML;
             }
 
-            // Create temporary textarea to copy content
+            // Use modern Clipboard API if available, fallback to execCommand
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(htmlContent)
+                    .then(() => {
+                        alert('✅ HTML copié dans le presse-papiers !');
+                    })
+                    .catch(err => {
+                        // Fallback to old method
+                        copyHTMLFallback(htmlContent);
+                    });
+            } else {
+                // Fallback for older browsers
+                copyHTMLFallback(htmlContent);
+            }
+        }
+
+        // Fallback copy method for older browsers
+        function copyHTMLFallback(htmlContent) {
             const tempTextarea = document.createElement('textarea');
             tempTextarea.value = htmlContent;
             document.body.appendChild(tempTextarea);

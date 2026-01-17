@@ -24,7 +24,7 @@ Un éditeur HTML WYSIWYG (What You See Is What You Get) simple et efficace, dév
 - HTML5
 - CSS3
 - JavaScript (Vanilla)
-- [Quill.js](https://quilljs.com/) - Éditeur de texte riche
+- Native browser contentEditable API for rich text editing
 
 ## 📦 Déploiement
 
